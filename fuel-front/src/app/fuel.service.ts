@@ -51,8 +51,8 @@ export class FuelService {
               });
   }
 
-   getPriceChartData(callback: (json:Data[]) => void) {
-      this.http.get<Data[]>(this.API_URL + '/chart/price').subscribe(js => callback(js))
+   getPriceChartData(years: number, callback: (json:Data[]) => void) {
+      this.http.get<Data[]>(this.API_URL + '/chart/price/' + years).subscribe(js => callback(js))
     }
 }
 

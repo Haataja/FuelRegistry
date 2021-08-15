@@ -1,7 +1,37 @@
+
+  <form #form="ngForm" class="container">
+    <table cellspacing="4">
+      <tr>
+        <td>
+          <mat-form-field appearance="outline" required="true">
+            <mat-label>Monta vuotta</mat-label>
+            <input matInput name="numberOfYears" type="number" #numberOfYears="ngModel"
+                   [(ngModel)]="data.numberOfYears">
+            <mat-hint align="start"><strong>Näytää vain 3 viime vuotta, 0 näyttää koko historian.</strong> </mat-hint>
+          </mat-form-field>
+
+        </td>
+
+        <td>
+          <button mat-stroked-button (click)="refresh()" color="accent">Päivitä</button>
+        </td>
+      </tr>
+    </table>
+
+  </form>
+
 <div class="mat-elevation-z8">
-  <ngx-charts-bar-vertical-2d [view]="[3000, 400]" [results]="multi" [gradient]="gradient"
-                           [xAxis]="showXAxis"
-                           [yAxis]="showYAxis" [legend]="showLegend" [showXAxisLabel]="showXAxisLabel"
-                           [showYAxisLabel]="showYAxisLabel" [xAxisLabel]="xAxisLabel"
-                           [yAxisLabel]="yAxisLabel" (select)="onSelect($event)"></ngx-charts-bar-vertical-2d>
+  <ngx-charts-bar-vertical-2d [results]="multi"
+                              [gradient]="gradient"
+                              [xAxis]="showXAxis"
+                              [yAxis]="showYAxis"
+                              [legend]="showLegend"
+                              [legendTitle]="legendTitle"
+                              [showXAxisLabel]="showXAxisLabel"
+                              [showYAxisLabel]="showYAxisLabel"
+                              [xAxisLabel]="xAxisLabel"
+                              [yAxisLabel]="yAxisLabel"
+                              (select)="onSelect($event)">
+
+  </ngx-charts-bar-vertical-2d>
 </div>
