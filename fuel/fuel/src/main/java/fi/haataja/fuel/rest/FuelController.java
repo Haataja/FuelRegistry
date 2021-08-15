@@ -21,6 +21,7 @@ import fi.haataja.fuel.model.ChartResult;
 import fi.haataja.fuel.model.RawChart;
 import fi.haataja.fuel.repository.FuelPurchase;
 import fi.haataja.fuel.repository.FuelRepository;
+import fi.haataja.fuel.service.DataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class FuelController {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private FuelRepository fuelRepository;
+    private DataService dataService;
 
 
     /**
@@ -50,11 +51,11 @@ public class FuelController {
     public ResponseEntity<Iterable<FuelPurchase>> getPurchases(@RequestParam(required = false) String date) {
         if (date == null) {
             log.info("Requesting all rows");
-            return new ResponseEntity<>(fuelRepository.findAllByOrderByDateDesc(), HttpStatus.OK);
+            return dataService.findAll();
         } else {
             log.info("Requesting rows starting from {}", date);
             LocalDate localDate = LocalDate.parse(date);
-            return new ResponseEntity<>(fuelRepository.findAllByDateAfterOrderByDateDesc(localDate), HttpStatus.OK);
+            return dataService.findAllByDate(localDate);
         }
     }
 
@@ -62,19 +63,13 @@ public class FuelController {
     @RequestMapping("/purchases/{id}")
     public ResponseEntity<FuelPurchase> getPurchaseById(@PathVariable long id) {
         log.info("Requesting row with id {}", id);
-        if (fuelRepository.findById(id).isPresent()) {
-            log.info("Row was found");
-            return new ResponseEntity<>(fuelRepository.findById(id).get(), HttpStatus.OK);
-        } else {
-            log.info("Row was not found");
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return dataService.findById(id);
     }
 
     @PostMapping("/purchases")
     public ResponseEntity<?> addPurchases(@RequestBody FuelPurchase fuelPurchase) {
         log.info("Adding rows for date {}", fuelPurchase.getDate());
-        return new ResponseEntity<>(fuelRepository.save(fuelPurchase), HttpStatus.CREATED);
+        return dataService.save(fuelPurchase);
     }
 
     /**
@@ -88,20 +83,7 @@ public class FuelController {
     public ResponseEntity<?> modifyPurchase(@RequestBody FuelPurchase purchase, @PathVariable long id) {
         log.info("Modifying rows for date {} and id {}", purchase.getDate(), id);
 
-        if (fuelRepository.findById(id).isPresent()) {
-            FuelPurchase existing = fuelRepository.findById(id).get();
-            existing.setDate(purchase.getDate());
-            existing.setDescription(purchase.getDescription());
-            existing.setCredit(purchase.isCredit());
-            existing.setLitre(purchase.getLitre());
-            existing.setLocation(purchase.getLocation());
-            existing.setMileage(purchase.getMileage());
-            existing.setPrice(purchase.getPrice());
-            existing.setPricePerLitre(purchase.getPricePerLitre());
-            return new ResponseEntity<>(fuelRepository.save(existing), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(purchase, HttpStatus.NOT_FOUND);
-        }
+        return dataService.modify(id, purchase);
     }
 
     /**
@@ -113,34 +95,19 @@ public class FuelController {
     @DeleteMapping("/purchases/{id}")
     public ResponseEntity<?> deletePurchase(@PathVariable long id) {
         log.info("Deleting row with id {}", id);
-        if (fuelRepository.findById(id).isPresent()) {
-            fuelRepository.deleteById(id);
-            return new ResponseEntity<>("{\"success\":\"ok\"}", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("{\"success\":\"error\"}", HttpStatus.NOT_FOUND);
-        }
+        return dataService.delete(id);
     }
 
     @GetMapping("/chart/price")
     public ResponseEntity<?> getPriceChartData(){
-        List<RawChart> rawData = fuelRepository.dataForPriceChart();
-        List<ChartResult> results = new ArrayList<>();
-        for(RawChart r: rawData) {
-            boolean newValue = true;
-            for(ChartResult c: results){
-                if(c.getName().equalsIgnoreCase(ConvertUtil.getMonth(r.getMonth()))){
-                    c.getSeries().add(new ChartResult.SeriesItem(String.valueOf(r.getYear()), r.getValue()));
-                    newValue = false;
-                    break;
-                }
-            }
+        log.info("Getting the price chart data");
+        return dataService.getPriceChartData(0);
+    }
 
-            if(newValue){
-                log.info("pojo: {}, {}, {}", ConvertUtil.getMonth(r.getMonth()), r.getYear(), r.getValue());
-                results.add(new ChartResult(ConvertUtil.getMonth(r.getMonth()), String.valueOf(r.getYear()), r.getValue()));
-            }
-        }
-        return new ResponseEntity<>(results, HttpStatus.OK);
+    @GetMapping("/chart/price/{years}")
+    public ResponseEntity<?> getPriceChartData(@PathVariable int years){
+        log.info("Getting the price chart data for last {} years", years);
+        return dataService.getPriceChartData(years);
     }
 
 

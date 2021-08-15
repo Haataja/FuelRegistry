@@ -35,4 +35,7 @@ public interface FuelRepository extends CrudRepository<FuelPurchase, Long> {
 
     @Query("select NEW fi.haataja.fuel.model.RawChart(MONTH(f.date), YEAR(f.date), sum(f.price)) from FuelPurchase AS f group by YEAR(f.date), MONTH(f.date) order by MONTH(f.date)")
     List<RawChart> dataForPriceChart();
+
+    @Query("select NEW fi.haataja.fuel.model.RawChart(MONTH(f.date), YEAR(f.date), sum(f.price)) from FuelPurchase AS f where YEAR(f.date) > YEAR(CURDATE()) - ?1 group by YEAR(f.date), MONTH(f.date) order by MONTH(f.date)")
+    List<RawChart> dataForPriceChart(int years);
 }
