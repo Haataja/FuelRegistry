@@ -1,0 +1,71 @@
+<h1 mat-dialog-title>Lisää tankkaus</h1>
+<div mat-dialog-content>
+  <h2>Anna tankkauksen tiedot:</h2>
+
+  <form #form="ngForm" class="container">
+    <table cellspacing="10">
+      <tr>
+        <td>
+          <mat-form-field appearance="outline"  required="true">
+            <mat-label>Päivämäärä</mat-label>
+            <input matInput name="date" type="date" required #date="ngModel" [(ngModel)]="data.date">
+          </mat-form-field>
+        </td>
+
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>Ajetut kilometrit</mat-label>
+            <input matInput name="mileage" type="number" #mileage="ngModel" [(ngModel)]="data.mileage">
+          </mat-form-field>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>litrat</mat-label>
+            <input matInput name="litre" type="number" #litre="ngModel" [(ngModel)]="data.litre">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>€/L</mat-label>
+            <input matInput name="pricePerLitre" type="number" #pricePerLitre="ngModel"
+                   [(ngModel)]="data.pricePerLitre">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>€</mat-label>
+            <input matInput name="price" type="number" #price="ngModel" [(ngModel)]="data.price">
+          </mat-form-field>
+        </td>
+      </tr>
+
+
+      <tr>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>Tankkaus paikka</mat-label>
+            <input matInput name="location" type="text" #location="ngModel" [(ngModel)]="data.location">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field appearance="outline">
+            <mat-label>Kuvaus</mat-label>
+            <input matInput name="description" type="text" #description="ngModel" [(ngModel)]="data.description">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-checkbox [(ngModel)]="data.credit" name="credit">Maksettu luotolla</mat-checkbox>
+        </td>
+      </tr>
+    </table>
+  </form>
+
+</div>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close color="warn">Peruuta</button>
+  <button mat-stroked-button [mat-dialog-close]="data" [disabled]="!form.form.valid" color="accent">Tallenna</button>
+</mat-dialog-actions>
