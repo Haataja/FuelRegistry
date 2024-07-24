@@ -28,7 +28,7 @@ public class FuelPurchase {
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private long id;
     private LocalDate date;
-    private int mileage;
+    private Long mileage;
     private double litre;
     private double pricePerLitre;
     private double price;
@@ -52,11 +52,11 @@ public class FuelPurchase {
         this.date = date;
     }
 
-    public int getMileage() {
+    public long getMileage() {
         return mileage;
     }
 
-    public void setMileage(int mileage) {
+    public void setMileage(long mileage) {
         this.mileage = mileage;
     }
 

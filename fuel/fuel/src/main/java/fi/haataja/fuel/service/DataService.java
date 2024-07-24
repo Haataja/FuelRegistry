@@ -24,7 +24,6 @@ import fi.haataja.fuel.repository.FuelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -41,12 +40,12 @@ public class DataService {
     @Autowired
     private FuelRepository fuelRepository;
 
-    public ResponseEntity<Iterable<FuelPurchase>> findAll(){
-        return new ResponseEntity<>(fuelRepository.findAllByOrderByDateDesc(), HttpStatus.OK);
+    public List<FuelPurchase> findAll(){
+        return fuelRepository.findAllByOrderByDateDesc();
     }
 
-    public ResponseEntity<Iterable<FuelPurchase>> findAllByDate(LocalDate localDate){
-        return new ResponseEntity<>(fuelRepository.findAllByDateAfterOrderByDateDesc(localDate), HttpStatus.OK);
+    public List<FuelPurchase> findAllByDate(LocalDate localDate){
+        return fuelRepository.findAllByDateAfterOrderByDateDesc(localDate);
     }
 
     public ResponseEntity<FuelPurchase> findById(long id){
@@ -61,11 +60,11 @@ public class DataService {
         }
     }
 
-    public ResponseEntity<?> save(FuelPurchase fuelPurchase){
-        return new ResponseEntity<>(fuelRepository.save(fuelPurchase), HttpStatus.CREATED);
+    public FuelPurchase save(FuelPurchase fuelPurchase){
+        return fuelRepository.save(fuelPurchase);
     }
 
-    public ResponseEntity<?> modify(long id, FuelPurchase purchase) {
+    public ResponseEntity<FuelPurchase> modify(long id, FuelPurchase purchase) {
         Optional<FuelPurchase> purchaseOpt = fuelRepository.findById(id);
         if (purchaseOpt.isPresent()) {
             FuelPurchase existing = purchaseOpt.get();
@@ -77,7 +76,7 @@ public class DataService {
             existing.setMileage(purchase.getMileage());
             existing.setPrice(purchase.getPrice());
             existing.setPricePerLitre(purchase.getPricePerLitre());
-            return save(existing);
+            return new ResponseEntity<>(save(existing), HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(purchase, HttpStatus.NOT_FOUND);
         }

@@ -29,9 +29,9 @@ public interface FuelRepository extends CrudRepository<FuelPurchase, Long> {
 
     Iterable<FuelPurchase> findAllByOrderByIdAsc();
 
-    Iterable<FuelPurchase> findAllByOrderByDateDesc();
+    List<FuelPurchase> findAllByOrderByDateDesc();
 
-    Iterable<FuelPurchase> findAllByDateAfterOrderByDateDesc(LocalDate refDate);
+    List<FuelPurchase> findAllByDateAfterOrderByDateDesc(LocalDate refDate);
 
     @Query("select NEW fi.haataja.fuel.model.RawChart(MONTH(f.date), YEAR(f.date), sum(f.price)) from FuelPurchase AS f group by YEAR(f.date), MONTH(f.date) order by MONTH(f.date)")
     List<RawChart> dataForPriceChart();

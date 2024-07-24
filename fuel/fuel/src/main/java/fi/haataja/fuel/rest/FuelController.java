@@ -18,6 +18,7 @@ package fi.haataja.fuel.rest;
 
 import fi.haataja.fuel.ConvertUtil;
 import fi.haataja.fuel.model.ChartResult;
+import fi.haataja.fuel.model.ListResponse;
 import fi.haataja.fuel.model.RawChart;
 import fi.haataja.fuel.repository.FuelPurchase;
 import fi.haataja.fuel.repository.FuelRepository;
@@ -43,19 +44,38 @@ public class FuelController {
 
 
     /**
+     * Gets all the fuel purchases made after date if date is given. Better for requesting with postman
+     *
+     * @return 200 and database rows.
+     */
+    @RequestMapping("/v2/purchases")
+    public ResponseEntity<ListResponse> getPurchasesV2(@RequestParam(required = false) String date) {
+        if (date == null) {
+            log.info("Requesting all rows");
+            List<FuelPurchase> data = dataService.findAll();
+            return new ResponseEntity<>(new ListResponse(data.size(),data), HttpStatus.OK);
+        } else {
+            log.info("Requesting rows starting from {}", date);
+            LocalDate localDate = LocalDate.parse(date);
+            List<FuelPurchase> data = dataService.findAllByDate(localDate);
+            return new ResponseEntity<>(new ListResponse(data.size(), data), HttpStatus.OK);
+        }
+    }
+
+    /**
      * Gets all the fuel purchases.
      *
      * @return 200 and database rows.
      */
     @RequestMapping("/purchases")
-    public ResponseEntity<Iterable<FuelPurchase>> getPurchases(@RequestParam(required = false) String date) {
+    public ResponseEntity<List<FuelPurchase>> getPurchases(@RequestParam(required = false) String date) {
         if (date == null) {
             log.info("Requesting all rows");
-            return dataService.findAll();
+            return new ResponseEntity<>(dataService.findAll(), HttpStatus.OK);
         } else {
             log.info("Requesting rows starting from {}", date);
             LocalDate localDate = LocalDate.parse(date);
-            return dataService.findAllByDate(localDate);
+            return new ResponseEntity<>(dataService.findAllByDate(localDate), HttpStatus.OK);
         }
     }
 
@@ -69,7 +89,7 @@ public class FuelController {
     @PostMapping("/purchases")
     public ResponseEntity<?> addPurchases(@RequestBody FuelPurchase fuelPurchase) {
         log.info("Adding rows for date {}", fuelPurchase.getDate());
-        return dataService.save(fuelPurchase);
+        return new ResponseEntity<>(dataService.save(fuelPurchase), HttpStatus.CREATED);
     }
 
     /**
